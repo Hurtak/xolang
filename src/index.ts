@@ -1,9 +1,7 @@
-import xxx from "./module2";
+import fs from "fs";
 
-function test(a: number): string {
-  return String(a);
+function main() {
+  const src = fs.;
 }
 
-const res = test(5);
-console.log(res);
-console.log(xxx(123));
+main()

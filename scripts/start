@@ -3,4 +3,4 @@
 cd "$(dirname "$0")/.."
 
 rm -r build
-./node_modules/.bin/tsc --color --watch
+./node_modules/.bin/tsc --pretty --watch
