@@ -1,5 +1,10 @@
 {
   // Place your settings in this file to overwrite default and user settings.
-  "editor.formatOnSave": true,
+  "[typescript]": {
+    "editor.formatOnSave": true
+  },
+  "[json]": {
+    "editor.formatOnSave": true
+  },
   "typescript.tsdk": "node_modules/typescript/lib"
 }
