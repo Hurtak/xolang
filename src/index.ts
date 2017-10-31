@@ -1,4 +1,4 @@
-import xxx from "./module";
+import xxx from "./module2";
 
 function test(a: number): string {
   return String(a);

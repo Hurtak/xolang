@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+cd "$(dirname "$0")/.."
+
+rm -r build
+./node_modules/.bin/tsc --color --watch
