@@ -2,14 +2,15 @@
   "compilerOptions": {
     "target": "ES2016",
     "module": "commonjs",
+
     "outDir": "./build",
     "rootDir": "./src",
 
-    "removeComments": false,
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "removeComments": false
   }
 }

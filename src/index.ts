@@ -25,32 +25,17 @@ interface IToken {
 }
 
 function charToToken(char: string): TokenType {
-  const charCode = char.codePointAt(0);
-  if (charCode === undefined) {
-    throw new Error(`charCode is undefined for char "${char}"`);
-  }
-
-  if (char === "{" || char === "}") {
+  if (/[{}]/.test(char)) {
     return TokenType.Braces;
-  } else if (char === "(" || char === ")") {
+  } else if (/[()]/.test(char)) {
     return TokenType.Parentheses;
-  } else if (char === " " || char === "\t") {
+  } else if (/[ \t]/.test(char)) {
     return TokenType.Whitespace;
-  } else if (char === "\n") {
+  } else if (/[\n]/.test(char)) {
     return TokenType.Newline;
-  }
-
-  if (
-    charCode >= ("0".codePointAt(0) as number) &&
-    charCode <= ("9".codePointAt(0) as number)
-  ) {
+  } else if (/[0-9]/.test(char)) {
     return TokenType.Number;
-  } else if (
-    (charCode >= ("a".codePointAt(0) as number) &&
-      charCode <= ("z".codePointAt(0) as number)) ||
-    (charCode >= ("A".codePointAt(0) as number) &&
-      charCode <= ("Z".codePointAt(0) as number))
-  ) {
+  } else if (/[a-zA-Z]/.test(char)) {
     return TokenType.Name;
   } else {
     throw new Error(`Unknown token "${char}"`);
