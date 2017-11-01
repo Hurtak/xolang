@@ -1,14 +1,27 @@
 import * as fs from "fs";
 import * as path from "path";
 
-function main(): void {
-  const src = fs.readFileSync(
-    path.join(__dirname, "../program/main.xo"),
-    "utf8",
-  );
+enum TokenType {
+  Whitespace = "WHITESPACE",
+  Newline = "NEWLINE",
 
-  const out = tokenize(src);
-  console.log(out);
+  Name = "NAME",
+  Number = "NUMBER",
+
+  Parentheses = "PARENTHESES",
+  Braces = "BRACES",
+}
+
+const TokenTypesGreedy = [
+  TokenType.Whitespace,
+  TokenType.Name,
+  TokenType.Newline,
+  TokenType.Number,
+];
+
+interface IToken {
+  type: TokenType;
+  value: string;
 }
 
 function charToToken(char: string): TokenType {
@@ -44,27 +57,6 @@ function charToToken(char: string): TokenType {
   }
 }
 
-enum TokenType {
-  Whitespace = "WHITESPACE",
-  Name = "NAME",
-  Parentheses = "PARENTHESES",
-  Newline = "NEWLINE",
-  Braces = "BRACES",
-  Number = "NUMBER",
-}
-
-const TokenTypesGreedy = [
-  TokenType.Whitespace,
-  TokenType.Name,
-  TokenType.Newline,
-  TokenType.Number,
-];
-
-interface IToken {
-  type: TokenType;
-  value: number | string;
-}
-
 function tokenize(source: string): IToken[] {
   const tokens = [];
 
@@ -90,6 +82,16 @@ function tokenize(source: string): IToken[] {
   }
 
   return tokens;
+}
+
+function main(): void {
+  const src = fs.readFileSync(
+    path.join(__dirname, "../program/main.xo"),
+    "utf8",
+  );
+
+  const out = tokenize(src);
+  console.log(out);
 }
 
 main();
