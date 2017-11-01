@@ -4,64 +4,83 @@ import * as path from "path";
 function main(): void {
   const src = fs.readFileSync(
     path.join(__dirname, "../program/main.xo"),
-    "utf8"
+    "utf8",
   );
 
   const out = tokenize(src);
   console.log(out);
 }
 
-const tokenTypes = {
-  WHITESPACE: "WHITESPACE",
-  NAME: "NAME",
-  PARENTHESES: "PARENTHESES",
-  BRACES: "BRACES",
-  NUMBER: "NUMBER"
-};
+function charToToken(char: string): TokenType {
+  const charCode = char.codePointAt(0);
+  if (charCode === undefined) {
+    throw new Error(`charCode is undefined for char "${char}"`);
+  }
 
-function charToToken(char: string) {
-  switch (char) {
-    case "{":
-    case "}":
-      return tokenTypes.BRACES;
-    case "(":
-    case ")":
-      return tokenTypes.PARENTHESES;
-    case " ":
-    case "\t":
-      return tokenTypes.WHITESPACE;
-    case "0":
-    case "1":
-    case "2":
-    case "3":
-    case "4":
-    case "5":
-    case "6":
-    case "7":
-    case "8":
-    case "9":
-      return tokenTypes.NUMBER;
-    default:
-      return tokenTypes.NAME;
+  if (char === "{" || char === "}") {
+    return TokenType.Braces;
+  } else if (char === "(" || char === ")") {
+    return TokenType.Parentheses;
+  } else if (char === " " || char === "\t") {
+    return TokenType.Whitespace;
+  } else if (char === "\n") {
+    return TokenType.Newline;
+  }
+
+  if (
+    charCode >= ("0".codePointAt(0) as number) &&
+    charCode <= ("9".codePointAt(0) as number)
+  ) {
+    return TokenType.Number;
+  } else if (
+    (charCode >= ("a".codePointAt(0) as number) &&
+      charCode <= ("z".codePointAt(0) as number)) ||
+    (charCode >= ("A".codePointAt(0) as number) &&
+      charCode <= ("Z".codePointAt(0) as number))
+  ) {
+    return TokenType.Name;
+  } else {
+    throw new Error(`Unknown token "${char}"`);
   }
 }
 
-function tokenize(source: string) {
+enum TokenType {
+  Whitespace = "WHITESPACE",
+  Name = "NAME",
+  Parentheses = "PARENTHESES",
+  Newline = "NEWLINE",
+  Braces = "BRACES",
+  Number = "NUMBER",
+}
+
+const TokenTypesGreedy = [
+  TokenType.Whitespace,
+  TokenType.Name,
+  TokenType.Newline,
+  TokenType.Number,
+];
+
+interface IToken {
+  type: TokenType;
+  value: number | string;
+}
+
+function tokenize(source: string): IToken[] {
   const tokens = [];
 
   let prevToken = charToToken(source[0]);
   let tokenValue = source[0];
+
   for (let i = 1; i < source.length; i++) {
     const char = source[i];
     const token = charToToken(char);
 
-    if (
-      token !== prevToken ||
-      [tokenTypes.BRACES, tokenTypes.PARENTHESES].includes(token)
-    ) {
+    if (token === prevToken && TokenTypesGreedy.includes(token)) {
+      // pass
+    } else {
       tokens.push({
         type: prevToken,
-        value: tokenValue
+        value: tokenValue,
       });
       tokenValue = "";
     }
