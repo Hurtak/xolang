@@ -6,11 +6,13 @@
     "outDir": "./build",
     "rootDir": "./src",
 
+    "sourceMap": true,
+    "removeComments": false,
+
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "removeComments": false
+    "noFallthroughCasesInSwitch": true
   }
 }
