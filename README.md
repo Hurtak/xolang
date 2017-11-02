@@ -4,8 +4,9 @@
 
 - https://github.com/thejameskyle/the-super-tiny-compiler/blob/master/the-super-tiny-compiler.js
 - ast
-    - fully type compile function
     - cleanup walk functions - so the do not use global state that much
+    - fully type compile function
+    - fix TS errors
 - compiler stuff
     - transformation
     - js code generation
