@@ -1,9 +1,9 @@
 import * as fs from "fs";
 import * as path from "path";
+import * as util from "util";
 
 enum TokenType {
   Whitespace = "WHITESPACE",
-  Newline = "NEWLINE",
 
   Name = "NAME",
   Number = "NUMBER",
@@ -12,58 +12,89 @@ enum TokenType {
   Braces = "BRACES",
 }
 
-const TokenTypesGreedy = [
-  TokenType.Whitespace,
-  TokenType.Name,
-  TokenType.Newline,
-  TokenType.Number,
-];
-
 interface IToken {
   type: TokenType;
   value: string;
 }
 
-function charToToken(char: string): TokenType {
-  if (/[{}]/.test(char)) {
-    return TokenType.Braces;
-  } else if (/[()]/.test(char)) {
-    return TokenType.Parentheses;
-  } else if (/[ \t]/.test(char)) {
-    return TokenType.Whitespace;
-  } else if (/[\n]/.test(char)) {
-    return TokenType.Newline;
-  } else if (/[0-9]/.test(char)) {
-    return TokenType.Number;
-  } else if (/[a-zA-Z]/.test(char)) {
-    return TokenType.Name;
-  } else {
-    throw new Error(`Unknown token "${char}"`);
-  }
-}
-
 function tokenize(source: string): IToken[] {
   const tokens = [];
+  let index = 0;
+  let char = source[index];
 
-  let prevToken = charToToken(source[0]);
-  let tokenValue = source[0];
+  function nextChar() {
+    index += 1;
+    char = source[index];
+  }
 
-  for (let i = 1; i < source.length; i++) {
-    const char = source[i];
-    const token = charToToken(char);
-
-    if (token === prevToken && TokenTypesGreedy.includes(token)) {
-      // pass
-    } else {
+  while (index < source.length) {
+    if (/[{}]/.test(char)) {
       tokens.push({
-        type: prevToken,
-        value: tokenValue,
+        type: TokenType.Braces,
+        value: char,
       });
-      tokenValue = "";
-    }
-    tokenValue += char;
+      nextChar();
 
-    prevToken = token;
+      continue;
+    }
+
+    if (/[()]/.test(char)) {
+      tokens.push({
+        type: TokenType.Parentheses,
+        value: char,
+      });
+      nextChar();
+
+      continue;
+    }
+
+    if (/[ \t]/.test(char)) {
+      nextChar();
+
+      continue;
+    }
+
+    if (/[\n]/.test(char)) {
+      nextChar();
+
+      continue;
+    }
+
+    const isCharNumberToken = (s: string): boolean => /[0-9]/.test(s);
+    if (isCharNumberToken(char)) {
+      let value = "";
+
+      while (isCharNumberToken(char)) {
+        value += char;
+        nextChar();
+      }
+
+      tokens.push({
+        type: TokenType.Number,
+        value: value,
+      });
+
+      continue;
+    }
+
+    const isCharNameToken = (s: string): boolean => /[a-zA-Z]/.test(s);
+    if (isCharNameToken(char)) {
+      let value = "";
+
+      while (isCharNameToken(char)) {
+        value += char;
+        nextChar();
+      }
+
+      tokens.push({
+        type: TokenType.Name,
+        value: value,
+      });
+
+      continue;
+    }
+
+    throw new Error(`Unknown token "${char}"`);
   }
 
   return tokens;
@@ -75,8 +106,17 @@ function main(): void {
     "utf8",
   );
 
-  const out = tokenize(src);
-  console.log(out);
+  const tokens = tokenize(src);
+
+  process.stdout.write(
+    util.inspect(tokens, {
+      showHidden: false,
+      depth: null, // default 2, null to unlimited
+      colors: true,
+      maxArrayLength: 100, // default: 100, null to unlimited
+      breakLength: 60, // default: 60, Infinity to unlimited
+    }),
+  );
 }
 
 main();
