@@ -16,12 +16,13 @@ enum TokenType {
 }
 
 enum ASTType {
-  NumberLiteral = "NumberLiteral",
-  StringLiteral = "StringLiteral",
-  CallExpression = "CallExpression",
+  LiteralNumber = "LiteralNumber",
+  LiteralString = "LiteralString",
+
+  FunctionCall = "FunctionCall",
   FunctionDeclaration = "FunctionDeclaration",
+
   Program = "Program",
-  Nothing = "Nothing",
 }
 
 // type TokenTypeWhitespace = " " | "\t";
@@ -199,7 +200,7 @@ function parser(tokens: IToken[]): INode {
       token = walkToken();
 
       return {
-        type: ASTType.NumberLiteral,
+        type: ASTType.LiteralNumber,
         value: value,
       };
     }
@@ -209,7 +210,7 @@ function parser(tokens: IToken[]): INode {
       token = walkToken();
 
       return {
-        type: ASTType.StringLiteral,
+        type: ASTType.LiteralString,
         value: value,
       };
     }
@@ -235,7 +236,7 @@ function parser(tokens: IToken[]): INode {
         token = walkToken(); // Skip `)`
 
         return {
-          type: ASTType.CallExpression,
+          type: ASTType.FunctionCall,
           name: value,
           params: params,
         };
@@ -245,19 +246,18 @@ function parser(tokens: IToken[]): INode {
     throw new Error(`Parser did not reckognize tocken type "${token.type}"`);
   }
 
-  const ast = {
-    type: ASTType.Program,
-    body: [],
-  };
-
+  const program = [];
   while (index < tokens.length) {
     const node = walk();
     if (node) {
-      ast.body.push();
+      program.push(node);
     }
   }
 
-  return ast;
+  return {
+    type: ASTType.Program,
+    body: program,
+  };
 }
 
 function main(): void {
