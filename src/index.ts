@@ -3,9 +3,8 @@ import * as path from "path";
 import * as util from "util";
 
 enum TokenType {
-  Whitespace = "WHITESPACE",
-
   Name = "NAME",
+  Whitespace = "WHITESPACE",
 
   Number = "NUMBER",
   String = "STRING",
@@ -16,7 +15,21 @@ enum TokenType {
   Braces = "BRACES",
 }
 
+const reserverNames = {
+  true: "true",
+  false: "false",
+
+  quote: '"',
+  equals: "=",
+  comma: ",",
+  parenthesesOpen: "(",
+  parenthesesClose: ")",
+  bracesOpen: "{",
+  bracesClose: "}",
+};
+
 enum ASTType {
+  LiteralBoolean = "LiteralBoolean",
   LiteralNumber = "LiteralNumber",
   LiteralString = "LiteralString",
 
@@ -69,7 +82,7 @@ function tokenize(source: string): IToken[] {
   }
 
   while (index < source.length) {
-    if (testChar(char, "{", "}")) {
+    if (testChar(char, reserverNames.bracesOpen, reserverNames.bracesClose)) {
       tokens.push({
         type: TokenType.Braces,
         value: char,
@@ -79,7 +92,13 @@ function tokenize(source: string): IToken[] {
       continue;
     }
 
-    if (testChar(char, "(", ")")) {
+    if (
+      testChar(
+        char,
+        reserverNames.parenthesesOpen,
+        reserverNames.parenthesesClose,
+      )
+    ) {
       tokens.push({
         type: TokenType.Parentheses,
         value: char,
@@ -89,7 +108,7 @@ function tokenize(source: string): IToken[] {
       continue;
     }
 
-    if (testChar(char, ",")) {
+    if (testChar(char, reserverNames.comma)) {
       tokens.push({
         type: TokenType.Comma,
         value: char,
@@ -99,7 +118,7 @@ function tokenize(source: string): IToken[] {
       continue;
     }
 
-    if (testChar(char, "=")) {
+    if (testChar(char, reserverNames.equals)) {
       tokens.push({
         type: TokenType.Equals,
         value: char,
@@ -121,7 +140,8 @@ function tokenize(source: string): IToken[] {
       continue;
     }
 
-    const isStringToken = (s: string): boolean => testChar(s, '"');
+    const isStringToken = (s: string): boolean =>
+      testChar(s, reserverNames.quote);
     if (isStringToken(char)) {
       let value = "";
 
@@ -159,7 +179,7 @@ function tokenize(source: string): IToken[] {
       continue;
     }
 
-    const isCharNameToken = (s: string): boolean => testChar(s, /[a-zA-Z]/);
+    const isCharNameToken = (s: string): boolean => testChar(s, /[a-zA-Z_]/);
     if (isCharNameToken(char)) {
       let value = "";
 
@@ -208,6 +228,19 @@ function parser(tokens: IToken[]): INode {
       return null;
     }
 
+    if (
+      token.value === reserverNames.true ||
+      token.value === reserverNames.false
+    ) {
+      const value = token.value;
+      token = walkToken();
+
+      return {
+        type: ASTType.LiteralBoolean,
+        value: value,
+      };
+    }
+
     if (token.type === TokenType.Number) {
       const value = token.value;
       token = walkToken();
@@ -230,15 +263,19 @@ function parser(tokens: IToken[]): INode {
 
     if (token.type === TokenType.Name) {
       const name = token.value;
-      const params = [];
-
       token = walkToken();
-      if (token.type === TokenType.Parentheses && token.value === "(") {
+
+      if (
+        token.type === TokenType.Parentheses &&
+        token.value === reserverNames.parenthesesOpen
+      ) {
+        const params = [];
         token = walkToken(); // Skip `(` after function name
 
         while (
           token.type !== TokenType.Parentheses ||
-          (token.type === TokenType.Parentheses && token.value !== ")")
+          (token.type === TokenType.Parentheses &&
+            token.value !== reserverNames.parenthesesClose)
         ) {
           const param = walk();
           if (param) {
@@ -253,7 +290,9 @@ function parser(tokens: IToken[]): INode {
           name: name,
           params: params,
         };
-      } else if (token.type === TokenType.Equals) {
+      }
+
+      if (token.type === TokenType.Equals) {
         token = walkToken(); // Skip `"`
         const body = walk();
 
