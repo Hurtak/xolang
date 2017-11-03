@@ -35,6 +35,15 @@ interface IToken {
   value: string;
 }
 
+function testChar(input: string, ...testers: Array<RegExp | string>): boolean {
+  return testers.some(tester => {
+    if (typeof tester === "string") {
+      return input === tester;
+    }
+    return tester.test(input);
+  });
+}
+
 function tokenize(source: string): IToken[] {
   const tokens = [];
   let index = 0;
@@ -46,7 +55,7 @@ function tokenize(source: string): IToken[] {
   }
 
   while (index < source.length) {
-    if (/[{}]/.test(char)) {
+    if (testChar(char, "{", "}")) {
       tokens.push({
         type: TokenType.Braces,
         value: char,
@@ -56,7 +65,7 @@ function tokenize(source: string): IToken[] {
       continue;
     }
 
-    if (/[()]/.test(char)) {
+    if (testChar(char, "(", ")")) {
       tokens.push({
         type: TokenType.Parentheses,
         value: char,
@@ -66,25 +75,25 @@ function tokenize(source: string): IToken[] {
       continue;
     }
 
-    if (/[ \t]/.test(char)) {
+    if (testChar(char, "", "\t")) {
       nextChar();
 
       continue;
     }
 
-    if (/[\n]/.test(char)) {
+    if (testChar(char, "\n")) {
       nextChar();
 
       continue;
     }
 
-    const isCharStringToken = (s: string): boolean => /["]/.test(s);
-    if (isCharStringToken(char)) {
+    const isStringToken = (s: string): boolean => testChar(s, '"');
+    if (isStringToken(char)) {
       let value = "";
 
       nextChar(); // Skip opening `"` char.
 
-      while (!isCharStringToken(char)) {
+      while (!isStringToken(char)) {
         value += char;
         nextChar();
       }
@@ -99,7 +108,7 @@ function tokenize(source: string): IToken[] {
       continue;
     }
 
-    const isCharNumberToken = (s: string): boolean => /[0-9]/.test(s);
+    const isCharNumberToken = (s: string): boolean => testChar(s, /[0-9]/);
     if (isCharNumberToken(char)) {
       let value = "";
 
@@ -116,7 +125,7 @@ function tokenize(source: string): IToken[] {
       continue;
     }
 
-    const isCharNameToken = (s: string): boolean => /[a-zA-Z]/.test(s);
+    const isCharNameToken = (s: string): boolean => testChar(s, /[a-zA-Z]/);
     if (isCharNameToken(char)) {
       let value = "";
 
