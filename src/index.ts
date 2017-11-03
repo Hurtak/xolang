@@ -18,7 +18,12 @@ enum TokenType {
 const reserverNames = {
   true: "true",
   false: "false",
+};
 
+const character = {
+  whitespace: " ",
+  tab: "\t",
+  newline: "\n",
   quote: '"',
   equals: "=",
   comma: ",",
@@ -49,9 +54,15 @@ enum ASTType {
 // type TokenTypeParentheses = "(" | ")";
 // type TokenTypeBraces = "{" | "}";
 
+interface ICharacterFilePosition {
+  lineNumber: number;
+  rowNumber: number;
+}
+
 interface IToken {
   type: TokenType;
   value: string;
+  filePosition: ICharacterFilePosition;
 }
 
 interface INode {
@@ -73,55 +84,66 @@ function testChar(input: string, ...testers: Array<RegExp | string>): boolean {
 
 function tokenize(source: string): IToken[] {
   const tokens = [];
+  let lineNumber = 1;
+  let rowNumber = 1;
+
   let index = 0;
   let char = source[index];
-
   function nextChar() {
     index += 1;
     char = source[index];
+
+    rowNumber += 1;
+    if (char === "\n") {
+      rowNumber = 1;
+      lineNumber += 1;
+    }
   }
 
   while (index < source.length) {
-    if (testChar(char, reserverNames.bracesOpen, reserverNames.bracesClose)) {
+    const filePosition = {
+      lineNumber: lineNumber,
+      rowNumber: rowNumber,
+    };
+
+    if (testChar(char, character.bracesOpen, character.bracesClose)) {
       tokens.push({
         type: TokenType.Braces,
         value: char,
+        filePosition: filePosition,
       });
       nextChar();
 
       continue;
     }
 
-    if (
-      testChar(
-        char,
-        reserverNames.parenthesesOpen,
-        reserverNames.parenthesesClose,
-      )
-    ) {
+    if (testChar(char, character.parenthesesOpen, character.parenthesesClose)) {
       tokens.push({
         type: TokenType.Parentheses,
         value: char,
+        filePosition: filePosition,
       });
       nextChar();
 
       continue;
     }
 
-    if (testChar(char, reserverNames.comma)) {
+    if (testChar(char, character.comma)) {
       tokens.push({
         type: TokenType.Comma,
         value: char,
+        filePosition: filePosition,
       });
       nextChar();
 
       continue;
     }
 
-    if (testChar(char, reserverNames.equals)) {
+    if (testChar(char, character.equals)) {
       tokens.push({
         type: TokenType.Equals,
         value: char,
+        filePosition: filePosition,
       });
       nextChar();
 
@@ -140,8 +162,7 @@ function tokenize(source: string): IToken[] {
       continue;
     }
 
-    const isStringToken = (s: string): boolean =>
-      testChar(s, reserverNames.quote);
+    const isStringToken = (s: string): boolean => testChar(s, character.quote);
     if (isStringToken(char)) {
       let value = "";
 
@@ -157,6 +178,7 @@ function tokenize(source: string): IToken[] {
       tokens.push({
         type: TokenType.String,
         value: value,
+        filePosition: filePosition,
       });
 
       continue;
@@ -174,6 +196,7 @@ function tokenize(source: string): IToken[] {
       tokens.push({
         type: TokenType.Number,
         value: value,
+        filePosition: filePosition,
       });
 
       continue;
@@ -191,12 +214,13 @@ function tokenize(source: string): IToken[] {
       tokens.push({
         type: TokenType.Name,
         value: value,
+        filePosition: filePosition,
       });
 
       continue;
     }
 
-    throw new Error(`Unknown token "${char}"`);
+    throw error(`Unknown token "${char}"`, filePosition);
   }
 
   return tokens;
@@ -267,7 +291,7 @@ function parser(tokens: IToken[]): INode {
 
       if (
         token.type === TokenType.Parentheses &&
-        token.value === reserverNames.parenthesesOpen
+        token.value === character.parenthesesOpen
       ) {
         const params = [];
         token = walkToken(); // Skip `(` after function name
@@ -275,7 +299,7 @@ function parser(tokens: IToken[]): INode {
         while (
           token.type !== TokenType.Parentheses ||
           (token.type === TokenType.Parentheses &&
-            token.value !== reserverNames.parenthesesClose)
+            token.value !== character.parenthesesClose)
         ) {
           const param = walk();
           if (param) {
@@ -304,7 +328,10 @@ function parser(tokens: IToken[]): INode {
       }
     }
 
-    throw new Error(`Parser did not reckognize tocken type "${token.type}"`);
+    throw error(
+      `Parser did not reckognize tocken "${token.value}"`,
+      token.filePosition,
+    );
   }
 
   const program = [];
@@ -336,9 +363,17 @@ function main(): void {
       depth: null, // default 2, null to unlimited
       colors: true,
       maxArrayLength: 100, // default: 100, null to unlimited
-      breakLength: 60, // default: 60, Infinity to unlimited
+      breakLength: 80, // default: 60, Infinity to unlimited
     }),
   );
+}
+
+function error(message: string, errorPosition: ICharacterFilePosition): Error {
+  return new Error(`
+    Hey man...
+      ${message}
+    at ${errorPosition.lineNumber}:${errorPosition.rowNumber}
+  `);
 }
 
 main();
