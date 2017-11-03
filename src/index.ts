@@ -10,6 +10,7 @@ enum TokenType {
   Number = "NUMBER",
   String = "STRING",
 
+  Equals = "EQUALS",
   Comma = "COMMA",
   Parentheses = "PARENTHESES",
   Braces = "BRACES",
@@ -19,8 +20,10 @@ enum ASTType {
   LiteralNumber = "LiteralNumber",
   LiteralString = "LiteralString",
 
+  VariableAssignment = "VariableAssignment",
+
   FunctionCall = "FunctionCall",
-  FunctionDeclaration = "FunctionDeclaration",
+  // FunctionDeclaration = "FunctionDeclaration",
 
   Program = "Program",
 }
@@ -89,6 +92,16 @@ function tokenize(source: string): IToken[] {
     if (testChar(char, ",")) {
       tokens.push({
         type: TokenType.Comma,
+        value: char,
+      });
+      nextChar();
+
+      continue;
+    }
+
+    if (testChar(char, "=")) {
+      tokens.push({
+        type: TokenType.Equals,
         value: char,
       });
       nextChar();
@@ -216,7 +229,7 @@ function parser(tokens: IToken[]): INode {
     }
 
     if (token.type === TokenType.Name) {
-      const value = token.value;
+      const name = token.value;
       const params = [];
 
       token = walkToken();
@@ -237,8 +250,17 @@ function parser(tokens: IToken[]): INode {
 
         return {
           type: ASTType.FunctionCall,
-          name: value,
+          name: name,
           params: params,
+        };
+      } else if (token.type === TokenType.Equals) {
+        token = walkToken(); // Skip `"`
+        const body = walk();
+
+        return {
+          type: ASTType.VariableAssignment,
+          name: name,
+          body: body ? [body] : undefined,
         };
       }
     }
