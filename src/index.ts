@@ -10,6 +10,7 @@ enum TokenType {
   Number = "NUMBER",
   String = "STRING",
 
+  Comma = "COMMA",
   Parentheses = "PARENTHESES",
   Braces = "BRACES",
 }
@@ -20,6 +21,7 @@ enum ASTType {
   CallExpression = "CallExpression",
   FunctionDeclaration = "FunctionDeclaration",
   Program = "Program",
+  Nothing = "Nothing",
 }
 
 // type TokenTypeWhitespace = " " | "\t";
@@ -33,6 +35,14 @@ enum ASTType {
 interface IToken {
   type: TokenType;
   value: string;
+}
+
+interface INode {
+  type: ASTType;
+  name?: IToken["value"];
+  value?: IToken["value"];
+  params?: INode[];
+  body?: INode[];
 }
 
 function testChar(input: string, ...testers: Array<RegExp | string>): boolean {
@@ -75,7 +85,17 @@ function tokenize(source: string): IToken[] {
       continue;
     }
 
-    if (testChar(char, "", "\t")) {
+    if (testChar(char, ",")) {
+      tokens.push({
+        type: TokenType.Comma,
+        value: char,
+      });
+      nextChar();
+
+      continue;
+    }
+
+    if (testChar(char, " ", "\t")) {
       nextChar();
 
       continue;
@@ -148,7 +168,7 @@ function tokenize(source: string): IToken[] {
   return tokens;
 }
 
-function parser(tokens: IToken[]) {
+function parser(tokens: IToken[]): INode {
   function getToken(offset = 0) {
     return tokens[index + offset];
   }
@@ -156,54 +176,69 @@ function parser(tokens: IToken[]) {
   let index = 0;
   let token = getToken();
 
-  function walk() {
+  function walk(): INode | null {
     function walkToken() {
       index += 1;
-      token = getToken();
+      return getToken();
+    }
+
+    if (token.type === TokenType.Whitespace) {
+      while (token.type === TokenType.Whitespace) {
+        token = walkToken();
+      }
+      return null;
+    }
+
+    if (token.type === TokenType.Comma) {
+      token = walkToken();
+      return null;
     }
 
     if (token.type === TokenType.Number) {
-      const data = {
-        type: ASTType.NumberLiteral,
-        value: token.value,
-      };
-      walkToken();
+      const value = token.value;
+      token = walkToken();
 
-      return data;
+      return {
+        type: ASTType.NumberLiteral,
+        value: value,
+      };
     }
 
     if (token.type === TokenType.String) {
-      const data = {
-        type: ASTType.StringLiteral,
-        value: token.value,
-      };
-      walkToken();
+      const value = token.value;
+      token = walkToken();
 
-      return data;
+      return {
+        type: ASTType.StringLiteral,
+        value: value,
+      };
     }
 
     if (token.type === TokenType.Name) {
-      const node = {
-        type: ASTType.CallExpression,
-        name: token.value,
-        params: [],
-      };
+      const value = token.value;
+      const params = [];
 
-      walkToken();
-
+      token = walkToken();
       if (token.type === TokenType.Parentheses && token.value === "(") {
-        walkToken(); // Skip `(` after function name
+        token = walkToken(); // Skip `(` after function name
 
         while (
           token.type !== TokenType.Parentheses ||
           (token.type === TokenType.Parentheses && token.value !== ")")
         ) {
-          node.params.push(walk());
+          const param = walk();
+          if (param) {
+            params.push(param);
+          }
         }
 
-        walkToken(); // Skip `)`
+        token = walkToken(); // Skip `)`
 
-        return node;
+        return {
+          type: ASTType.CallExpression,
+          name: value,
+          params: params,
+        };
       }
     }
 
@@ -216,7 +251,10 @@ function parser(tokens: IToken[]) {
   };
 
   while (index < tokens.length) {
-    ast.body.push(walk());
+    const node = walk();
+    if (node) {
+      ast.body.push();
+    }
   }
 
   return ast;
