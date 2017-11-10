@@ -1,5 +1,8 @@
 // comment
 // comment // nested
+/* multiline
+    /*nested*/
+   comment */
 bool_true = true
 bool_false = false
 number = 10

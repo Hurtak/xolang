@@ -3,18 +3,19 @@ import * as path from "path";
 import * as util from "util";
 
 enum TokenType {
-  Name = "NAME",
-  Whitespace = "WHITESPACE",
+  Name = "Name",
+  Whitespace = "Whitespace",
 
-  Number = "NUMBER",
-  String = "STRING",
+  Number = "Number",
+  String = "String",
 
-  COMMENT = "COMMENT",
+  Comment = "Comment",
+  CommentMultiline = "CommentMultiline",
 
-  Equals = "EQUALS",
-  Comma = "COMMA",
-  Parentheses = "PARENTHESES",
-  Braces = "BRACES",
+  Equals = "Equals",
+  Comma = "Comma",
+  Parentheses = "Parentheses",
+  Braces = "Braces",
 }
 
 const reserverNames = {
@@ -28,6 +29,7 @@ const character = {
   newline: "\n",
   quote: `'`,
   equals: "=",
+  asterisk: "*",
   comma: ",",
   slashForward: "/",
   parenthesesOpen: "(",
@@ -93,16 +95,20 @@ function tokenize(source: string): IToken[] {
   let rowNumber = 1;
 
   let index = 0;
-  let char = source[index];
+  let char = getChar();
   function nextChar() {
     index += 1;
-    char = source[index];
+    char = getChar();
 
     rowNumber += 1;
     if (char === character.newline) {
       rowNumber = 1;
       lineNumber += 1;
     }
+  }
+
+  function getChar(offset = 0) {
+    return source[index + offset];
   }
 
   while (index < source.length) {
@@ -145,23 +151,64 @@ function tokenize(source: string): IToken[] {
     }
 
     if (testChar(char, character.slashForward)) {
-      let value = "";
+      nextChar(); // Skip `/`.
 
-      nextChar(); // Skip first `/`.
-      nextChar(); // Skip second `/`.
+      if (char === character.slashForward) {
+        nextChar(); // Skip second `/`.
 
-      while (char !== character.newline) {
-        value += char;
-        nextChar();
+        let value = "";
+        while (char !== character.newline) {
+          value += char;
+          nextChar();
+        }
+
+        tokens.push({
+          type: TokenType.Comment,
+          value: value,
+          filePosition: filePosition,
+        });
+
+        continue;
       }
 
-      tokens.push({
-        type: TokenType.COMMENT,
-        value: value,
-        filePosition: filePosition,
-      });
+      const isCommentStart = (): boolean =>
+        getChar() === character.slashForward &&
+        getChar(1) === character.asterisk;
+      const isCommentEnd = (): boolean =>
+        getChar() === character.asterisk &&
+        getChar(1) === character.slashForward;
 
-      continue;
+      if (char === character.asterisk) {
+        nextChar(); // Skip `*`.
+
+        let commentNestingLevel = 1;
+        let value = "";
+        while (true) {
+          if (isCommentStart()) {
+            commentNestingLevel += 1;
+          }
+          if (isCommentEnd()) {
+            commentNestingLevel -= 1;
+            if (commentNestingLevel === 0) {
+              // Skip closing `*/`
+              nextChar();
+              nextChar();
+              break;
+            }
+          }
+
+          value += char;
+          nextChar();
+        }
+
+        tokens.push({
+          type: TokenType.Comment,
+          value: value,
+          filePosition: filePosition,
+        });
+
+        continue;
+      }
     }
 
     if (testChar(char, character.equals)) {
@@ -277,7 +324,7 @@ function parser(tokens: IToken[]): INode {
       return null;
     }
 
-    if (token.type === TokenType.COMMENT) {
+    if (token.type === TokenType.Comment) {
       const value = token.value;
       token = walkToken();
 
