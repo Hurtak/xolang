@@ -1,3 +1,5 @@
+// comment
+// comment // nested
 bool_true = true
 bool_false = false
 number = 10

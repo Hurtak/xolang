@@ -5,7 +5,8 @@
 - https://github.com/thejameskyle/the-super-tiny-compiler/blob/master/the-super-tiny-compiler.js
 - features
     - comments
-        - nested comments
+        - multiline
+            - nested comments
     - floats
     - arrays
 - compiler stuff

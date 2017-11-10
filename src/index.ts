@@ -9,6 +9,8 @@ enum TokenType {
   Number = "NUMBER",
   String = "STRING",
 
+  COMMENT = "COMMENT",
+
   Equals = "EQUALS",
   Comma = "COMMA",
   Parentheses = "PARENTHESES",
@@ -27,6 +29,7 @@ const character = {
   quote: `'`,
   equals: "=",
   comma: ",",
+  slashForward: "/",
   parenthesesOpen: "(",
   parenthesesClose: ")",
   bracesOpen: "{",
@@ -42,6 +45,8 @@ enum ASTType {
 
   FunctionCall = "FunctionCall",
   // FunctionDeclaration = "FunctionDeclaration",
+
+  Comment = "Comment",
 
   Program = "Program",
 }
@@ -94,7 +99,7 @@ function tokenize(source: string): IToken[] {
     char = source[index];
 
     rowNumber += 1;
-    if (char === "\n") {
+    if (char === character.newline) {
       rowNumber = 1;
       lineNumber += 1;
     }
@@ -139,6 +144,26 @@ function tokenize(source: string): IToken[] {
       continue;
     }
 
+    if (testChar(char, character.slashForward)) {
+      let value = "";
+
+      nextChar(); // Skip first `/`.
+      nextChar(); // Skip second `/`.
+
+      while (char !== character.newline) {
+        value += char;
+        nextChar();
+      }
+
+      tokens.push({
+        type: TokenType.COMMENT,
+        value: value,
+        filePosition: filePosition,
+      });
+
+      continue;
+    }
+
     if (testChar(char, character.equals)) {
       tokens.push({
         type: TokenType.Equals,
@@ -150,13 +175,13 @@ function tokenize(source: string): IToken[] {
       continue;
     }
 
-    if (testChar(char, " ", "\t")) {
+    if (testChar(char, character.whitespace, character.tab)) {
       nextChar();
 
       continue;
     }
 
-    if (testChar(char, "\n")) {
+    if (testChar(char, character.newline)) {
       nextChar();
 
       continue;
@@ -252,6 +277,16 @@ function parser(tokens: IToken[]): INode {
       return null;
     }
 
+    if (token.type === TokenType.COMMENT) {
+      const value = token.value;
+      token = walkToken();
+
+      return {
+        type: ASTType.Comment,
+        value: value,
+      };
+    }
+
     if (
       token.value === reserverNames.true ||
       token.value === reserverNames.false
@@ -329,7 +364,7 @@ function parser(tokens: IToken[]): INode {
     }
 
     throw error(
-      `Parser did not reckognize tocken "${token.value}"`,
+      `Parser did not reckognize token ${JSON.stringify(token)}`,
       token.filePosition,
     );
   }
