@@ -24,7 +24,7 @@ const character = {
   whitespace: " ",
   tab: "\t",
   newline: "\n",
-  quote: '"',
+  quote: `'`,
   equals: "=",
   comma: ",",
   parenthesesOpen: "(",
