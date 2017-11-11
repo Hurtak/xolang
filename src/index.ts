@@ -171,23 +171,21 @@ function tokenize(source: string): IToken[] {
         continue;
       }
 
-      const isCommentStart = (): boolean =>
-        getChar() === character.slashForward &&
-        getChar(1) === character.asterisk;
-      const isCommentEnd = (): boolean =>
-        getChar() === character.asterisk &&
-        getChar(1) === character.slashForward;
-
       if (char === character.asterisk) {
         nextChar(); // Skip `*`.
 
         let commentNestingLevel = 1;
         let value = "";
         while (true) {
-          if (isCommentStart()) {
+          if (
+            getChar() === character.slashForward &&
+            getChar(1) === character.asterisk
+          ) {
             commentNestingLevel += 1;
-          }
-          if (isCommentEnd()) {
+          } else if (
+            getChar() === character.asterisk &&
+            getChar(1) === character.slashForward
+          ) {
             commentNestingLevel -= 1;
             if (commentNestingLevel === 0) {
               // Skip closing `*/`

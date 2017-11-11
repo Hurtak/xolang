@@ -60,7 +60,6 @@ x = add(10 20)
 x = add 10 20
     |> x => add2 x
     |> x => substract x 5
-
 ```
 
 ### Cycles
