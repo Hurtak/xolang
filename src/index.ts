@@ -32,6 +32,7 @@ const character = {
   asterisk: "*",
   comma: ",",
   slashForward: "/",
+  underline: "_",
   parenthesesOpen: "(",
   parenthesesClose: ")",
   bracesOpen: "{",
@@ -258,9 +259,15 @@ function tokenize(source: string): IToken[] {
     if (isCharNumberToken(char)) {
       let value = "";
 
-      while (isCharNumberToken(char)) {
-        value += char;
-        nextChar();
+      while (true) {
+        if (isCharNumberToken(char)) {
+          value += char;
+          nextChar();
+        } else if (char === character.underline) {
+          nextChar();
+        } else {
+          break;
+        }
       }
 
       tokens.push({
