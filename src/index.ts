@@ -1,6 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as util from "util";
+import * as meow from "meow";
 
 enum TokenType {
   Name = "Name",
@@ -435,15 +436,40 @@ function parser(tokens: IToken[]): INode {
   };
 }
 
+function error(message: string, errorPosition: ICharacterFilePosition): Error {
+  return new Error(`
+    Hey man...
+      ${message}
+    at ${errorPosition.lineNumber}:${errorPosition.rowNumber}
+  `);
+}
+
 function main(): void {
-  const src = fs.readFileSync(
-    path.join(__dirname, "../program/main.xo"),
-    "utf8",
-  );
+  const cli = meow(`
+    Hello there!
+
+    Usage
+      $ xo <filename>
+
+    Options
+      none so far
+  `);
+
+  const fileName = cli.input[0];
+  if (!fileName) {
+    throw new Error("Missing filename as first command line argument");
+  }
+
+  const cwd = process.cwd();
+  const filePath = path.join(cwd, fileName);
+
+  const src = fs.readFileSync(filePath, "utf8");
 
   const tokens = tokenize(src);
   const ast = parser(tokens);
 
+  console.log("Using file: " + fileName);
+  console.log("");
   process.stdout.write(
     util.inspect(ast, {
       showHidden: false,
@@ -453,14 +479,6 @@ function main(): void {
       breakLength: 80, // default: 60, Infinity to unlimited
     }),
   );
-}
-
-function error(message: string, errorPosition: ICharacterFilePosition): Error {
-  return new Error(`
-    Hey man...
-      ${message}
-    at ${errorPosition.lineNumber}:${errorPosition.rowNumber}
-  `);
 }
 
 main();

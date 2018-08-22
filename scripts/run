@@ -2,5 +2,4 @@
 
 cd "$(dirname "$0")/.."
 
-# ./node_modules/.bin/ts-node src/index.ts
-node build/index.js
+node build/index.js "$@"
