@@ -9,8 +9,11 @@
       "request": "launch",
       "name": "Launch Program",
       "program": "${workspaceFolder}/src/index.ts",
+      "args": [
+        "example_programs/comments.xo"
+      ],
       "preLaunchTask": "tsc: build - tsconfig.json",
-      "outFiles": ["${workspaceFolder}/build/**/*.js"]
+      "outFiles": ["${workspaceFolder}/.xo/**/*.js"]
     }
   ]
 }
