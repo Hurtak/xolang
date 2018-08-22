@@ -2,6 +2,10 @@
 
 ## TODO
 
+- write output file
+
+---
+
 - features
   - floats
   - arrays
@@ -36,6 +40,7 @@
 - linter
   - no unused variables
   - no unused functions
+  - variable names are not snake_case
 - autoupdater from version A to B
 - autoformatter
 

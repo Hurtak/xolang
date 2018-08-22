@@ -1,12 +1,5 @@
-// comment
-// comment // nested
-/* multiline
-    /*nested*/
-   comment */
 bool_true = true
 bool_false = false
-number = 10
-number_with_separators = 3_123_456
 string = 'hello'
 x = add(1, 2)
 add(add(1, 2), 3)

@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as util from "util";
 import * as meow from "meow";
+import * as prettier from "prettier";
 
 enum TokenType {
   Name = "Name",
@@ -91,7 +92,7 @@ function testChar(input: string, ...testers: Array<RegExp | string>): boolean {
   });
 }
 
-function tokenize(source: string): IToken[] {
+function sourceToTokens(source: string): IToken[] {
   const tokens = [];
   let lineNumber = 1;
   let rowNumber = 1;
@@ -304,7 +305,7 @@ function tokenize(source: string): IToken[] {
   return tokens;
 }
 
-function parser(tokens: IToken[]): INode {
+function tokensToAst(tokens: IToken[]): INode {
   function getToken(offset = 0) {
     return tokens[index + offset];
   }
@@ -436,6 +437,44 @@ function parser(tokens: IToken[]): INode {
   };
 }
 
+function astToJavaScriptSource(ast: INode[], out = ""): string {
+  for (const node of ast) {
+    if (node.body) {
+      for (const body of node.body) {
+        out = astToJavaScriptSource([body], out);
+      }
+    } else {
+      switch (node.type) {
+        case ASTType.Comment: {
+          out += "\n";
+          out += "/*";
+          out += node.value;
+          out += "*/";
+          break;
+        }
+
+        default: {
+          throw new Error(
+            `JS source emitter did not implement node type "${node.type}"`,
+          );
+        }
+      }
+    }
+  }
+
+  return out;
+}
+
+function formatToLogOutput(stuff: object): string {
+  return util.inspect(stuff, {
+    showHidden: false,
+    depth: null, // default 2, null to unlimited
+    colors: true,
+    maxArrayLength: 100, // default: 100, null to unlimited
+    breakLength: 80, // default: 60, Infinity to unlimited
+  });
+}
+
 function error(message: string, errorPosition: ICharacterFilePosition): Error {
   return new Error(`
     Hey man...
@@ -455,30 +494,38 @@ function main(): void {
       none so far
   `);
 
-  const fileName = cli.input[0];
-  if (!fileName) {
-    throw new Error("Missing filename as first command line argument");
+  const sourceFilePath = cli.input[0];
+  if (!sourceFilePath) {
+    throw new Error("Missing file path as first command line argument");
   }
 
+  console.log("Using file: " + sourceFilePath);
+  console.log("");
+
   const cwd = process.cwd();
-  const filePath = path.join(cwd, fileName);
+  const filePath = path.join(cwd, sourceFilePath);
 
   const src = fs.readFileSync(filePath, "utf8");
 
-  const tokens = tokenize(src);
-  const ast = parser(tokens);
-
-  console.log("Using file: " + fileName);
+  console.log("Tokens:");
+  const tokens = sourceToTokens(src);
+  console.log(formatToLogOutput(tokens));
   console.log("");
-  process.stdout.write(
-    util.inspect(ast, {
-      showHidden: false,
-      depth: null, // default 2, null to unlimited
-      colors: true,
-      maxArrayLength: 100, // default: 100, null to unlimited
-      breakLength: 80, // default: 60, Infinity to unlimited
-    }),
-  );
+
+  console.log("AST:");
+  const ast = tokensToAst(tokens);
+  console.log(formatToLogOutput(ast));
+  console.log("");
+
+  console.log("Generated JS:");
+  let javaScriptOutput = astToJavaScriptSource([ast]);
+  javaScriptOutput = prettier.format(javaScriptOutput, { parser: "babylon" });
+  console.log(javaScriptOutput);
+  console.log("");
+
+  // const outFilePath = path.join(cwd, ".build", sourceFilePath.replace(".xo", ".js"));
+  // console.log("Outputting JS file: ", outFilePath);
+  // fs.writeFileSync(outFilePath, javaScriptOutput, "utf8");
 }
 
 main();
