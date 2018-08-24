@@ -1,4 +1,4 @@
-import * as fs from "fs";
+import * as fs from "fs-extra";
 import * as path from "path";
 import * as util from "util";
 import * as meow from "meow";
@@ -483,7 +483,7 @@ function error(message: string, errorPosition: ICharacterFilePosition): Error {
   `);
 }
 
-function main(): void {
+async function main(): Promise<void> {
   const cli = meow(`
     Hello there!
 
@@ -505,7 +505,7 @@ function main(): void {
   const cwd = process.cwd();
   const filePath = path.join(cwd, sourceFilePath);
 
-  const src = fs.readFileSync(filePath, "utf8");
+  const src = await fs.readFile(filePath, "utf8");
 
   console.log("Tokens:");
   const tokens = sourceToTokens(src);
@@ -523,9 +523,13 @@ function main(): void {
   console.log(javaScriptOutput);
   console.log("");
 
-  // const outFilePath = path.join(cwd, ".build", sourceFilePath.replace(".xo", ".js"));
-  // console.log("Outputting JS file: ", outFilePath);
-  // fs.writeFileSync(outFilePath, javaScriptOutput, "utf8");
+  const outFilePath = path.join(
+    cwd,
+    ".build",
+    sourceFilePath.replace(".xo", ".js"),
+  );
+  console.log("Outputting JS file: ", outFilePath);
+  await fs.outputFile(outFilePath, javaScriptOutput);
 }
 
 main();
