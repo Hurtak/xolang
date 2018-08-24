@@ -523,12 +523,10 @@ async function main(): Promise<void> {
   console.log(javaScriptOutput);
   console.log("");
 
-  const outFilePath = path.join(
-    cwd,
-    ".build",
-    sourceFilePath.replace(".xo", ".js"),
-  );
+  const dirBuild = path.join(cwd, ".build");
+  const outFilePath = path.join(dirBuild, sourceFilePath.replace(".xo", ".js"));
   console.log("Outputting JS file: ", outFilePath);
+  await fs.remove(dirBuild);
   await fs.outputFile(outFilePath, javaScriptOutput);
 }
 
