@@ -1,5 +1,3 @@
-bool_true = true
-bool_false = false
 string = 'hello'
 x = add(1, 2)
 add(add(1, 2), 3)

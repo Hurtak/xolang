@@ -7,6 +7,7 @@ import * as prettier from "prettier";
 enum TokenType {
   Name = "Name",
   Whitespace = "Whitespace",
+  NewLine = "NewLine",
 
   Number = "Number",
   String = "String",
@@ -21,6 +22,7 @@ enum TokenType {
 }
 
 const reserverNames = {
+  let: "let",
   true: "true",
   false: "false",
 };
@@ -28,7 +30,7 @@ const reserverNames = {
 const character = {
   whitespace: " ",
   tab: "\t",
-  newline: "\n",
+  newLine: "\n",
   quote: `'`,
   equals: "=",
   asterisk: "*",
@@ -52,6 +54,7 @@ enum ASTType {
   // FunctionDeclaration = "FunctionDeclaration",
 
   Comment = "Comment",
+  NewLine = "NewLine",
 
   Program = "Program",
 }
@@ -104,7 +107,7 @@ function sourceToTokens(source: string): IToken[] {
     char = getChar();
 
     rowNumber += 1;
-    if (char === character.newline) {
+    if (char === character.newLine) {
       rowNumber = 1;
       lineNumber += 1;
     }
@@ -160,7 +163,7 @@ function sourceToTokens(source: string): IToken[] {
         nextChar(); // Skip second `/`.
 
         let value = "";
-        while (char !== character.newline) {
+        while (char !== character.newLine) {
           value += char;
           nextChar();
         }
@@ -229,7 +232,12 @@ function sourceToTokens(source: string): IToken[] {
       continue;
     }
 
-    if (testChar(char, character.newline)) {
+    if (testChar(char, character.newLine)) {
+      tokens.push({
+        type: TokenType.NewLine,
+        value: char,
+        filePosition: filePosition,
+      });
       nextChar();
 
       continue;
@@ -305,7 +313,7 @@ function sourceToTokens(source: string): IToken[] {
   return tokens;
 }
 
-function tokensToAst(tokens: IToken[]): INode {
+function tokensToAst(tokens: IToken[]): INode[] {
   function getToken(offset = 0) {
     return tokens[index + offset];
   }
@@ -324,6 +332,15 @@ function tokensToAst(tokens: IToken[]): INode {
         token = walkToken();
       }
       return null;
+    }
+
+    if (token.type === TokenType.NewLine) {
+      const value = token.value;
+      token = walkToken();
+      return {
+        type: ASTType.NewLine,
+        value: value,
+      };
     }
 
     if (token.type === TokenType.Comma) {
@@ -375,46 +392,69 @@ function tokensToAst(tokens: IToken[]): INode {
     }
 
     if (token.type === TokenType.Name) {
-      const name = token.value;
-      token = walkToken();
+      if (token.value === reserverNames.let) {
+        token = walkToken(); // advance from let
 
-      if (
-        token.type === TokenType.Parentheses &&
-        token.value === character.parenthesesOpen
-      ) {
-        const params = [];
-        token = walkToken(); // Skip `(` after function name
-
-        while (
-          token.type !== TokenType.Parentheses ||
-          (token.type === TokenType.Parentheses &&
-            token.value !== character.parenthesesClose)
-        ) {
-          const param = walk();
-          if (param) {
-            params.push(param);
-          }
+        const variableName = token.value;
+        if (token.type !== TokenType.Name) {
+          throw error(
+            `Variable name expected after let definition. eg "let variable_name = 0;"`,
+            token.filePosition,
+          );
         }
 
-        token = walkToken(); // Skip `)`
+        token = walkToken(); // advance from variable name
+        if (token.value !== character.equals) {
+          throw error(
+            `Equals is expected after variable name. eg "let variable_name = 0;"`,
+            token.filePosition,
+          );
+        }
 
-        return {
-          type: ASTType.FunctionCall,
-          name: name,
-          params: params,
-        };
-      }
+        token = walkToken(); // advance from "="
 
-      if (token.type === TokenType.Equals) {
-        token = walkToken(); // Skip `"`
-        const body = walk();
+        const body = [];
+        while (token.type !== TokenType.NewLine) {
+          body.push(token);
+          token = walkToken();
+        }
 
         return {
           type: ASTType.VariableAssignment,
-          name: name,
-          body: body ? [body] : undefined,
+          name: variableName,
+          body: tokensToAst(body),
         };
       }
+
+      // const name = token.value;
+      // token = walkToken();
+      //
+      // if (
+      //   token.type === TokenType.Parentheses &&
+      //   token.value === character.parenthesesOpen
+      // ) {
+      //   const params = [];
+      //   token = walkToken(); // Skip `(` after function name
+
+      //   while (
+      //     token.type !== TokenType.Parentheses ||
+      //     (token.type === TokenType.Parentheses &&
+      //       token.value !== character.parenthesesClose)
+      //   ) {
+      //     const param = walk();
+      //     if (param) {
+      //       params.push(param);
+      //     }
+      //   }
+
+      //   token = walkToken(); // Skip `)`
+
+      //   return {
+      //     type: ASTType.FunctionCall,
+      //     name: name,
+      //     params: params,
+      //   };
+      // }
     }
 
     throw error(
@@ -423,41 +463,73 @@ function tokensToAst(tokens: IToken[]): INode {
     );
   }
 
-  const program = [];
+  const body = [];
   while (index < tokens.length) {
     const node = walk();
     if (node) {
-      program.push(node);
+      body.push(node);
     }
   }
 
+  return body;
+}
+
+function toknesToAstProgram(tokens: IToken[]): INode {
   return {
     type: ASTType.Program,
-    body: program,
+    body: tokensToAst(tokens),
   };
 }
 
-function astToJavaScriptSource(ast: INode[], out = ""): string {
+function astToJavaScriptSource(ast: INode[] = [], out = ""): string {
   for (const node of ast) {
-    if (node.body) {
-      for (const body of node.body) {
-        out = astToJavaScriptSource([body], out);
+    switch (node.type) {
+      case ASTType.Program: {
+        out += astToJavaScriptSource(node.body);
+        break;
       }
-    } else {
-      switch (node.type) {
-        case ASTType.Comment: {
-          out += "\n";
-          out += "/*";
-          out += node.value;
-          out += "*/";
-          break;
+
+      case ASTType.VariableAssignment: {
+        out += "let " + node.name + " = ";
+        out += astToJavaScriptSource(node.body);
+        break;
+      }
+
+      case ASTType.NewLine: {
+        out += "\n";
+        break;
+      }
+
+      case ASTType.Comment: {
+        out += "/*";
+        out += node.value;
+        out += "*/";
+        break;
+      }
+
+      case ASTType.LiteralBoolean: {
+        switch (node.value) {
+          case reserverNames.true:
+            out += "false";
+            break;
+
+          case reserverNames.false:
+            out += "true";
+            break;
+
+          default:
+            throw new Error(
+              `JS source emitter did not implement node type "${node.type}"`,
+            );
         }
 
-        default: {
-          throw new Error(
-            `JS source emitter did not implement node type "${node.type}"`,
-          );
-        }
+        break;
+      }
+
+      default: {
+        throw new Error(
+          `JS source emitter did not implement node type "${node.type}"`,
+        );
       }
     }
   }
@@ -513,7 +585,7 @@ async function main(): Promise<void> {
   console.log("");
 
   console.log("AST:");
-  const ast = tokensToAst(tokens);
+  const ast = toknesToAstProgram(tokens);
   console.log(formatToLogOutput(ast));
   console.log("");
 

@@ -3,12 +3,11 @@
 ## TODO
 
 - variables
-  - booleans
-  - null?
   - strings
   - numbers
     - int (64bit, js only has 52 or something)
     - float
+  - null?
 
 ---
 
