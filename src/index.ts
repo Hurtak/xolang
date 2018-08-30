@@ -289,7 +289,7 @@ function sourceToTokens(source: string): IToken[] {
       continue;
     }
 
-    const isCharNameToken = (s: string): boolean => testChar(s, /[a-zA-Z_]/);
+    const isCharNameToken = (s: string): boolean => testChar(s, /[a-zA-Z0-9_]/);
     if (isCharNameToken(char)) {
       let value = "";
 
@@ -523,6 +523,11 @@ function astToJavaScriptSource(ast: INode[] = [], out = ""): string {
             );
         }
 
+        break;
+      }
+
+      case ASTType.LiteralNumber: {
+        out += node.value;
         break;
       }
 

@@ -2,6 +2,7 @@
 
 ## TODO
 
+- show where error happened
 - variables
   - strings
   - numbers
