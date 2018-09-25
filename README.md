@@ -205,3 +205,8 @@ for i=1; i<length(key); i += 1 {
 
 }
 ```
+
+## Long term promotion
+
+- product placement?
+- deal with online schools that teach web dev?
