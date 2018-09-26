@@ -206,7 +206,12 @@ for i=1; i<length(key); i += 1 {
 }
 ```
 
-## Long term promotion
+## Random notes
 
-- product placement?
-- deal with online schools that teach web dev?
+- Inspiration:
+  - Skip programming language
+    - https://news.ycombinator.com/item?id=18077612
+    - http://skiplang.com/
+- Long term promotion
+  - product placement?
+  - deal with online schools that teach web dev?
