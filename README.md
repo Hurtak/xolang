@@ -206,6 +206,20 @@ for i=1; i<length(key); i += 1 {
 }
 ```
 
+### Pure function
+
+- Function that can only touch
+  - parameters
+  - variables/functions defined inside of it
+  - other pure functions?
+  - anything immutable (constants/interfaces)?
+
+```js
+let foo = pure (a, b) => {
+  return a + b
+}
+```
+
 ### Asserts
 
 #### Regular asserts
