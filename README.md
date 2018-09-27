@@ -208,6 +208,8 @@ for i=1; i<length(key); i += 1 {
 
 ## Random notes
 
+- Licensing
+  - https://twitter.com/geekovo/status/1045263759030112258
 - Inspiration:
   - Skip programming language
     - https://news.ycombinator.com/item?id=18077612
