@@ -206,6 +206,38 @@ for i=1; i<length(key); i += 1 {
 }
 ```
 
+### Asserts
+
+#### Regular asserts
+
+- Should it be imported or in global scope?
+
+```js
+assert(a > 0);
+```
+
+- if asserting is in hot path we could do the assert only every x runs?
+
+```js
+@skipPercentage(50) // 50% asserts are going to be skipped
+assert(a > 0);
+```
+
+#### Assert Types
+
+- assert is automatically run when value is accessed or assigned
+
+```js
+interface Person {
+  name: {
+    type: string,
+    assert: (value) => {
+      return value.length > 0
+    }
+  }
+}
+```
+
 ## Random notes
 
 - Licensing
