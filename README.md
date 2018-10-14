@@ -206,6 +206,8 @@ for i=1; i<length(key); i += 1 {
 }
 ```
 
+## Ideas
+
 ### Pure function
 
 - Function that can only touch
@@ -251,6 +253,29 @@ interface Person {
   }
 }
 ```
+
+### Record
+
+```js
+function main() {
+  let res;
+  res = longrunningFunction1();
+  res = longrunningFunction2();
+
+  record;
+
+  res = longrunningFunction3();
+}
+```
+
+- when `record` statement is hit, it saves complete state of the aplication
+- then we can somehow run it again from that place
+- super useful for debugging some place of the program where it takes a long time to get there
+  - eg some decent amount of user interaction
+  - or vyzkumnici have lots of long running functions around datasets and they fine tune algorithms
+- almost python netebook style programming?
+- TODO: how to run recorded stuff
+- TODO: what if something from before the record changes?
 
 ## Random notes
 
