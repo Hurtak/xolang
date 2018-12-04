@@ -463,15 +463,15 @@ function tokensToAst(tokens: IToken[]): INode[] {
     );
   }
 
-  const body = [];
+  const res = [];
   while (index < tokens.length) {
     const node = walk();
     if (node) {
-      body.push(node);
+      res.push(node);
     }
   }
 
-  return body;
+  return res;
 }
 
 function toknesToAstProgram(tokens: IToken[]): INode {
