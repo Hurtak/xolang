@@ -78,11 +78,11 @@
 ```python
 import Iter
 import Math
-import ./Utils { isEvent, double }
+import ./Utils { isEven, double }
 import ./path/to/Constants
 
 let total = Constants.numbers
-    |> Iter.filter isEvent
+    |> Iter.filter isEven
     |> Iter.map double
     |> Iter.reduce(add, 0)
 ```
