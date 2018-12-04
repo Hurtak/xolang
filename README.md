@@ -43,6 +43,10 @@
 - package manager
   - accepts any git repository, so github links mostly but also could be locally hosted projects/directories
   - versioned std lib (compiler needs to ship with all versions or this will be pulled from github?)
+  - audited packages
+    - have a way to dispaly if cerpatin packages (and their dependencies) were audited by someone
+    - have trust system, audit from someone known more valuable than someone new?
+    - https://github.com/eirslett/package-trust
 - linter
   - no unused variables
   - no unused functions
