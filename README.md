@@ -2,6 +2,7 @@
 
 ## TODO
 
+- automatic tests?
 - show where error happened
 - variables
   - strings
@@ -280,6 +281,7 @@ function main() {
 - almost python netebook style programming?
 - TODO: how to run recorded stuff
 - TODO: what if something from before the record changes?
+- The other thing is that `await` should have been inverted. You should mark function calls you don't want to wait for, not the other way around. Waiting should be the default for a function call
 
 ## Random notes
 
