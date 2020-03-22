@@ -21,7 +21,7 @@ enum TokenType {
   Braces = "Braces",
 }
 
-const reserverNames = {
+const reservedNames = {
   let: "let",
   true: "true",
   false: "false",
@@ -359,8 +359,8 @@ function tokensToAst(tokens: IToken[]): INode[] {
     }
 
     if (
-      token.value === reserverNames.true ||
-      token.value === reserverNames.false
+      token.value === reservedNames.true ||
+      token.value === reservedNames.false
     ) {
       const value = token.value;
       token = walkToken();
@@ -392,7 +392,7 @@ function tokensToAst(tokens: IToken[]): INode[] {
     }
 
     if (token.type === TokenType.Name) {
-      if (token.value === reserverNames.let) {
+      if (token.value === reservedNames.let) {
         token = walkToken(); // advance from let
 
         const variableName = token.value;
@@ -509,11 +509,11 @@ function astToJavaScriptSource(ast: INode[] = [], out = ""): string {
 
       case ASTType.LiteralBoolean: {
         switch (node.value) {
-          case reserverNames.true:
+          case reservedNames.true:
             out += "false";
             break;
 
-          case reserverNames.false:
+          case reservedNames.false:
             out += "true";
             break;
 
