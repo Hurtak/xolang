@@ -1,0 +1,10 @@
+#!/usr/bin/env bash -e
+
+cd "$(dirname "$0")/.."
+
+./scripts/lint
+./scripts/compile
+./scripts/run ./example_programs/comments.xo
+./scripts/run ./example_programs/main.xo
+./scripts/run ./example_programs/variables/booleans.xo
+./scripts/run ./example_programs/variables/integers.xo
