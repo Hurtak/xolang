@@ -3,8 +3,9 @@
 cd "$(dirname "$0")/.."
 
 ./scripts/lint
+rm -rf .build
+rm -rf .xo
 ./scripts/compile
-./scripts/run ./example_programs/comments.xo
-./scripts/run ./example_programs/main.xo
-./scripts/run ./example_programs/variables/booleans.xo
-./scripts/run ./example_programs/variables/integers.xo
+./scripts/run example_programs/comments.xo
+./scripts/run example_programs/variables/booleans.xo
+./scripts/run example_programs/variables/integers.xo

@@ -1,3 +1,0 @@
-string = 'hello'
-x = add(1, 2)
-add(add(1, 2), 3)
