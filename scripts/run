@@ -2,4 +2,13 @@
 
 cd "$(dirname "$0")/.."
 
-node .xo/index.js "$@"
+rm -rf .xo
+./node_modules/.bin/ts-node-dev \
+  --pretty \
+  --log-error \
+  --no-notify \
+  --respawn \
+  --watch \
+  "./example_programs" \
+  ./src/index.ts \
+  "$@"

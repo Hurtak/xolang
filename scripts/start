@@ -1,6 +1,0 @@
-#!/usr/bin/env bash
-
-cd "$(dirname "$0")/.."
-
-rm -rf .xo
-./node_modules/.bin/tsc --pretty --watch
