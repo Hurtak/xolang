@@ -54,6 +54,7 @@ enum ASTType {
   // FunctionDeclaration = "FunctionDeclaration",
 
   Comment = "Comment",
+  CommentMultiline = "CommentMultiline",
   NewLine = "NewLine",
 
   Program = "Program",
@@ -206,7 +207,7 @@ function sourceToTokens(source: string): IToken[] {
         }
 
         tokens.push({
-          type: TokenType.Comment,
+          type: TokenType.CommentMultiline,
           value: value,
           filePosition: filePosition,
         });
@@ -358,6 +359,16 @@ function tokensToAst(tokens: IToken[]): INode[] {
       };
     }
 
+    if (token.type === TokenType.CommentMultiline) {
+      const value = token.value;
+      token = walkToken();
+
+      return {
+        type: ASTType.CommentMultiline,
+        value: value,
+      };
+    }
+
     if (
       token.value === reservedNames.true ||
       token.value === reservedNames.false
@@ -474,7 +485,7 @@ function tokensToAst(tokens: IToken[]): INode[] {
   return res;
 }
 
-function toknesToAstProgram(tokens: IToken[]): INode {
+function tokensToAstProgram(tokens: IToken[]): INode {
   return {
     type: ASTType.Program,
     body: tokensToAst(tokens),
@@ -501,9 +512,24 @@ function astToJavaScriptSource(ast: INode[] = [], out = ""): string {
       }
 
       case ASTType.Comment: {
-        out += "/*";
+        out += "//";
         out += node.value;
-        out += "*/";
+        break;
+      }
+
+      case ASTType.CommentMultiline: {
+        const lines = (node.value || "").split("\n");
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i];
+          out += "//";
+          out += line;
+
+          const lastItem = lines.length - 1 === i;
+          if (!lastItem) {
+            out += "\n";
+          }
+        }
+
         break;
       }
 
@@ -590,7 +616,7 @@ async function main(): Promise<void> {
   console.log("");
 
   console.log("AST:");
-  const ast = toknesToAstProgram(tokens);
+  const ast = tokensToAstProgram(tokens);
   console.log(formatToLogOutput(ast));
   console.log("");
 

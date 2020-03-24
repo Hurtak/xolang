@@ -1,8 +1,12 @@
+//
 // comment
+// comment // nested
   // comment indented
-/* comment multiline on single line */
+
+/**/
+/* comment multi-line */
+/* comment multi-line /* nested */ */
 /*
   comment
-  multiline
-  on multiple lines
+  multi-line
 */

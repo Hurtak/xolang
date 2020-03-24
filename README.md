@@ -2,14 +2,13 @@
 
 ## TODO
 
-- automatic tests?
-- show where error happened
 - variables
   - strings
   - numbers
     - int (64bit, js only has 52 or something)
     - float
   - null?
+- show where error happened
 
 ---
 
