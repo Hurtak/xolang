@@ -2,4 +2,4 @@
 
 cd "$(dirname "$0")/.."
 
-./node_modules/.bin/tsc --pretty
+go build -o bin/xo src/main.go
