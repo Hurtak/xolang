@@ -2,6 +2,12 @@
 
 ## TODO
 
+- tokenizer
+- parse comments
+- js output target
+
+---
+
 - variables
   - strings
   - numbers
@@ -9,15 +15,14 @@
     - float
   - null?
 - show where error happened
-
----
-
 - features
   - floats
   - arrays
 - compiler stuff
   - transformation
   - js code generation
+- turtle library for learning
+  - https://docs.python.org/3.3/library/turtle.html?highlight=turtle
 
 ## High level overview
 
@@ -262,13 +267,13 @@ interface Person {
 
 ```js
 function main() {
-  let res;
-  res = longrunningFunction1();
-  res = longrunningFunction2();
+	let res;
+	res = longrunningFunction1();
+	res = longrunningFunction2();
 
-  record;
+	record;
 
-  res = longrunningFunction3();
+	res = longrunningFunction3();
 }
 ```
 
