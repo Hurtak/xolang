@@ -59,6 +59,12 @@
 - autoupdater from version A to B
 - autoformatter
 
+## UI components
+
+- Have universal UI components that first compile to Web
+- Take inspiration from Flutter
+  - https://www.youtube.com/watch?v=FCyoHclCqc8&feature=emb_title
+
 ## Syntax
 
 - Source: https://twitter.com/jamiebuilds/status/1020025386531401729
