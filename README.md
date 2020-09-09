@@ -58,6 +58,12 @@
   - variable names are not snake_case
 - autoupdater from version A to B
 - autoformatter
+- web framework
+  - needs to have FE + BE
+  - form auto-generated crud
+    - https://demo.adminer.org/editor.php?username=
+    - or like Rails
+  - forms need to be super simple, like in Nette - thats because they have FE and BE covered in one framework, there is no split
 
 ## UI components
 
