@@ -299,6 +299,8 @@ function main() {
 - TODO: how to run recorded stuff
 - TODO: what if something from before the record changes?
 - The other thing is that `await` should have been inverted. You should mark function calls you don't want to wait for, not the other way around. Waiting should be the default for a function call
+- Idea: build in help
+  - "Not directly related, but when I was learning programming back in highschool (before the Internet) what made it easy was the built in help in Turbo Pascal. You could press F1 over any function or keyword and you were given a detailed description and example of usage. Learning C later using the K&R book and Google was a huge downgrade. Even today I think that language help built into the IDE should be a basic functionality." - https://news.ycombinator.com/item?id=25150547
 
 ## Random notes
 
