@@ -40,6 +40,7 @@
 - distributed as a single binary where everything is packaged (node...)
 - pluggable like jai, import compiler/parser/whatever/package manager as a library
 - end goal - replace brittle stacks of dependencies that yo do not control with xo https://twitter.com/iljapanic/status/1295828432572612609
+- detect unused code https://twitter.com/jfmengels/status/1331329218630852608?s=20
 
 ### Ecosystem
 
