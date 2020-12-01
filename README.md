@@ -23,6 +23,27 @@
   - js code generation
 - turtle library for learning
   - https://docs.python.org/3.3/library/turtle.html?highlight=turtle
+- error handling
+  - https://news.ycombinator.com/item?id=25253471
+  - easy to use
+
+```js
+const script = () => {
+	const file = File.read('test.txt') // returns Either<FileContent, ErrorsUnion>
+
+	const file = File.read('test.txt').unwrap() // returns FileContent
+
+	// but modifies rest of the function to basically be
+	match File.read('test.txt') {
+		case Ok(FikeContent) => {
+			// rest of the script
+		}
+		case Err => {
+			return Left(Err)
+		}
+	}
+}
+```
 
 ## High level overview
 
