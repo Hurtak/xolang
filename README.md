@@ -45,6 +45,19 @@ const script = () => {
 }
 ```
 
+- great idea: exhaustiveness pattern matching with default that specifies number of rest patterns
+
+```js
+type Currency = USD | CZK | XXX
+const tax = match Currency {
+  case USD -> 0.2
+  case else 2 -> 0
+  // This 2 is important, means match all of the cases, but there needs to be 2 of them, so when we remove or add new case,
+  // the compiler will complain and we will need to update and rethink all of our exhaustiveness pattern mathching cases
+}
+
+```
+
 ## High level overview
 
 ### Features
