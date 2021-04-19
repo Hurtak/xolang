@@ -1,5 +1,8 @@
 # XOXO
 
+- data structures
+  - https://twitter.com/alesroubicek/status/1384072121081499657
+
 ## TODO
 
 - tokenizer
