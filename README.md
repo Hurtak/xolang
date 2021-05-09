@@ -2,6 +2,8 @@
 
 - data structures
   - https://twitter.com/alesroubicek/status/1384072121081499657
+- viral
+  - https://twitter.com/JanRuziJan/status/1391318261967376386?s=20
 
 ## TODO
 
