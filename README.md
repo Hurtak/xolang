@@ -4,12 +4,14 @@
   - https://twitter.com/alesroubicek/status/1384072121081499657
 - viral
   - https://twitter.com/JanRuziJan/status/1391318261967376386?s=20
+  - store with share where devs can develop plugins
 
 ## TODO
 
 - tokenizer
 - parse comments
 - js output target
+- something like dependencies cruiser
 
 ---
 
