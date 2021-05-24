@@ -5,6 +5,7 @@
 - viral
   - https://twitter.com/JanRuziJan/status/1391318261967376386?s=20
   - store with share where devs can develop plugins
+- https://twitter.com/atomkirk/status/1396238932078055424
 
 ## TODO
 
