@@ -38,6 +38,39 @@
   - easy to use
 
 ```js
+const sanitizeEmail = (email: String): String => {
+	return input.trim().toLowerCase();
+};
+
+const validateEmail = (email: String): Boolean => {
+	return true;
+};
+
+const UserController = () => {
+	const userService = UserService();
+
+	return {
+		changePassword: (userId: String, newPassword: String) => {
+			userService.changePassword(userId, newPassword);
+			smtpService.sendEmail(userId, newPassword);
+		},
+	};
+};
+
+const main = () => {
+	const userController = UserController();
+
+	const res = userController.changePassword("userId1", "newPassword");
+  switch (res) {
+    case Either(data) {
+      return [200, "Change ok"]
+    }
+    case
+  }
+};
+```
+
+```js
 const script = () => {
 	const file = File.read('test.txt') // returns Either<FileContent, ErrorsUnion>
 
