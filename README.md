@@ -36,6 +36,41 @@
 - error handling
   - https://news.ycombinator.com/item?id=25253471
   - easy to use
+- visual aids / audio aids that could help with development
+  - https://www.youtube.com/watch?v=fQALnHD8kr4
+
+```js
+const sanitizeEmail = (email: String): String => {
+	return input.trim().toLowerCase();
+};
+
+const validateEmail = (email: String): Boolean => {
+	return true;
+};
+
+const UserController = () => {
+	const userService = UserService();
+
+	return {
+		changePassword: (userId: String, newPassword: String) => {
+			userService.changePassword(userId, newPassword);
+			smtpService.sendEmail(userId, newPassword);
+		},
+	};
+};
+
+const main = () => {
+	const userController = UserController();
+
+	const res = userController.changePassword("userId1", "newPassword");
+  switch (res) {
+    case Either(data) {
+      return [200, "Change ok"]
+    }
+    case
+  }
+};
+```
 
 ```js
 const script = () => {
