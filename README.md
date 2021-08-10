@@ -1,5 +1,16 @@
 # XOXO
 
+- prepare reference implementation
+  - parallel fetching of data with
+    - retries
+    - parallell settings
+  - data transformation
+  - error handling/recovery
+  - write in js
+  - write in new lang
+
+---
+
 - data structures
   - https://twitter.com/alesroubicek/status/1384072121081499657
 - viral
@@ -38,91 +49,6 @@
   - easy to use
 - visual aids / audio aids that could help with development
   - https://www.youtube.com/watch?v=fQALnHD8kr4
-
-```js
-const sanitizeEmail = (email: String): String => {
-	return input.trim().toLowerCase();
-};
-
-const validateEmail = (email: String): Boolean => {
-	return true;
-};
-
-const UserController = () => {
-	const userService = UserService();
-
-	return {
-		changePassword: (userId: String, newPassword: String) => {
-			userService.changePassword(userId, newPassword);
-			smtpService.sendEmail(userId, newPassword);
-		},
-	};
-};
-
-const main = () => {
-	const userController = UserController();
-
-	const res = userController.changePassword("userId1", "newPassword");
-  switch (res) {
-    case Either(data) {
-      return [200, "Change ok"]
-    }
-    case
-  }
-};
-```
-
-```js
-const sanitizeEmail = (email: String): String => {
-	return input.trim().toLowerCase();
-};
-
-const validateEmail = (email: String): Boolean => {
-	return true;
-};
-
-const UserController = () => {
-	const userService = UserService();
-
-	return {
-		changePassword: (userId: String, newPassword: String) => {
-			userService.changePassword(userId, newPassword);
-			smtpService.sendEmail(userId, newPassword);
-		},
-	};
-};
-
-const main = () => {
-	const userController = UserController();
-
-	const res = userController.changePassword("userId1", "newPassword");
-  switch (res) {
-    case Either(data) {
-      return [200, "Change ok"]
-    }
-    case
-  }
-};
-```
-
-```js
-const script = () => {
-	const file = File.read('test.txt') // returns Either<FileContent, ErrorsUnion>
-
-	const file = File.read('test.txt').unwrap() // returns FileContent
-
-	// but modifies rest of the function to basically be
-	match File.read('test.txt') {
-		case Ok(FikeContent) => {
-			// rest of the script
-		}
-		case Err => {
-			return Left(Err)
-		}
-	}
-}
-```
-
 - great idea: exhaustiveness pattern matching with default that specifies number of rest patterns
 
 ```js
