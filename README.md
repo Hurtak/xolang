@@ -10,6 +10,8 @@
   - write in new lang
 - prototype in go
   - https://www.practical-go-lessons.com/chap-1-programming-a-computer
+- something like babel macros?
+  - https://github.com/evenchange4/svgr.macro
 
 ---
 
