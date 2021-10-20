@@ -13,6 +13,8 @@
 - something like babel macros?
   - https://github.com/evenchange4/svgr.macro
 - book resource: http://www.craftinginterpreters.com/contents.html
+- uml examples
+  - https://real-world-plantuml.com/
 
 ---
 
