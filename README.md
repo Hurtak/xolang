@@ -15,6 +15,16 @@
 - book resource: http://www.craftinginterpreters.com/contents.html
 - uml examples
   - https://real-world-plantuml.com/
+- super simple lang - no pipe operator, we can do this
+
+```
+
+sum = {
+	localVar = [1,2,3]
+	localVar = localVar.reduce((c, acc) => acc + c)
+	return localVar
+}
+```
 
 ---
 
